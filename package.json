@@ -1,0 +1,26 @@
+{
+  "name": "aus-property-sales",
+  "version": "0.0.1",
+  "description": "This pack will help you get and access the property data in australia",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clear": "rm -rf dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Maka314/AusPropertySales.git"
+  },
+  "author": "Michael Ju",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Maka314/AusPropertySales/issues"
+  },
+  "homepage": "https://github.com/Maka314/AusPropertySales#readme",
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}
