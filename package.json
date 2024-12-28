@@ -19,6 +19,9 @@
     "url": "https://github.com/Maka314/AusPropertySales/issues"
   },
   "homepage": "https://github.com/Maka314/AusPropertySales#readme",
+  "dependencies": {
+    "sqlite3": "^5.1.7"
+  },
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.2",
