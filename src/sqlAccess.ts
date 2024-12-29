@@ -1,10 +1,11 @@
-import { Database } from "sqlite3";
+import { Database } from 'sqlite3';
 
 export default class SqlAccess {
   private db!: Database;
+  public hold: Promise<void>;
 
   constructor(dbRoute: string) {
-    this.init(dbRoute);
+    this.hold = this.init(dbRoute);
   }
 
   private async init(dbRoute: string) {
@@ -13,14 +14,15 @@ export default class SqlAccess {
         if (err) {
           reject(err);
         } else {
-          console.log("Database connected successfully.");
+          console.log('Database connected successfully.');
           resolve(db);
         }
       });
     });
   }
 
-  printDb() {
-    console.log(this.db);
-  };
+  async printDbStatus() {
+    await this.hold;
+    console.log('Database status:', this.db);
+  }
 }
