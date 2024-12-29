@@ -13,6 +13,20 @@ export default class SqlAccess {
     console.log('Database status:', this.db);
   }
 
+  async setupSchema() {
+    await this.hold;
+
+    // Create the index table
+    await this.asyncRun(`CREATE TABLE IF NOT EXISTS current_year_weeks_index (
+          date TEXT NOT NULL PRIMARY KEY,
+          obtained BOOLEAN NOT NULL
+        )`);
+    await this.asyncRun(`CREATE TABLE IF NOT EXISTS old_years_index (
+          year TEXT NOT NULL PRIMARY KEY,
+          obtained BOOLEAN NOT NULL
+        )`);
+  }
+
   private async init(dbRoute: string) {
     this.db = await new Promise<Database>((resolve, reject) => {
       const db = new Database(dbRoute, (err) => {
