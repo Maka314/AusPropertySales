@@ -25,4 +25,30 @@ export default class SqlAccess {
     await this.hold;
     console.log('Database status:', this.db);
   }
+
+  private async asyncRun(command: string) {
+    await this.hold;
+    new Promise<void>((resolve, reject) => {
+      this.db.run(command, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  private async asyncGet(command: string) {
+    await this.hold;
+    return new Promise<any[]>((resolve, reject) => {
+      this.db.all(command, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  }
 }
