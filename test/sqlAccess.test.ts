@@ -1,5 +1,5 @@
-import sqlAccess from "../src/sqlAccess";
+import sqlAccess from '../src/sqlAccess';
 
-test("SqlAccess", () => {
-    const db = new sqlAccess("/workspace/test123.db");
+test('SqlAccess', async () => {
+  const db = new sqlAccess('/workspaces/AusPropertySales/test/test.db');
 });
