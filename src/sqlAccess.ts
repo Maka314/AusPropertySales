@@ -1,10 +1,5 @@
 import { Database } from "sqlite3";
 
-const yearDownloadBaseUrl =
-  "https://www.valuergeneral.nsw.gov.au/__psi/yearly/";
-const weekDownloadBaseUrl =
-  "https://www.valuergeneral.nsw.gov.au/__psi/weekly/";
-
 export default class SqlAccess {
   private db!: Database;
   public hold: Promise<void>;
