@@ -25,6 +25,41 @@ export default class SqlAccess {
           year TEXT NOT NULL PRIMARY KEY,
           obtained BOOLEAN NOT NULL
         )`);
+
+    // Insert years date into old_years_index
+    const currentYear = new Date().getFullYear();
+    for (let year = 1990; year < currentYear; year++) {
+      this.asyncGet(`SELECT 1 FROM old_years_index WHERE year = ${year}`).then(
+        (rows) => {
+          if (rows.length === 0) {
+            this.asyncRun(
+              `INSERT INTO old_years_index (year, obtained) VALUES (${year}, false)`
+            );
+          }
+        }
+      );
+    }
+
+    // Insert weeks date into current_year_weeks_index
+    const mondayOfYear = new Date(currentYear, 0, 1);
+    const currentDate = new Date();
+    while (mondayOfYear.getDay() !== 1) {
+      mondayOfYear.setDate(mondayOfYear.getDate() + 1);
+    }
+    for (
+      ;
+      mondayOfYear < currentDate;
+      mondayOfYear.setDate(mondayOfYear.getDate() + 7)
+    ) {
+      const dateString = mondayOfYear.toYYMMDD();
+      await this.asyncGet(
+        `select 1 from current_year_weeks_index where date = '${dateString}'`
+      ).then((rows) => {
+        if (rows.length === 0) {
+          this.asyncRun(`INSERT INTO current_year_weeks_index (date, obtained) VALUES ('${dateString}', false)`);
+        }
+      });
+    }
   }
 
   private async init(dbRoute: string) {
@@ -33,7 +68,6 @@ export default class SqlAccess {
         if (err) {
           reject(err);
         } else {
-          console.log('Database connected successfully.');
           resolve(db);
         }
       });
@@ -42,7 +76,7 @@ export default class SqlAccess {
 
   private async asyncRun(command: string) {
     await this.hold;
-    new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.db.run(command, (err) => {
         if (err) {
           reject(err);
@@ -53,7 +87,7 @@ export default class SqlAccess {
     });
   }
 
-  private async asyncGet(command: string) {
+  public async asyncGet(command: string) {
     await this.hold;
     return new Promise<any[]>((resolve, reject) => {
       this.db.all(command, (err, rows) => {
@@ -66,3 +100,18 @@ export default class SqlAccess {
     });
   }
 }
+
+declare global {
+  interface Date {
+    toYYMMDD(): string;
+  }
+}
+
+Date.prototype.toYYMMDD = function (): string {
+  const year = this.getFullYear();
+  const month = this.getMonth() + 1;
+  const day = this.getDate();
+  return `${year}-${month < 10 ? '0' : ''}${month}-${
+    day < 10 ? '0' : ''
+  }${day}`;
+};
