@@ -1,4 +1,9 @@
-import { Database } from 'sqlite3';
+import { Database } from "sqlite3";
+
+const yearDownloadBaseUrl =
+  "https://www.valuergeneral.nsw.gov.au/__psi/yearly/";
+const weekDownloadBaseUrl =
+  "https://www.valuergeneral.nsw.gov.au/__psi/weekly/";
 
 export default class SqlAccess {
   private db!: Database;
@@ -10,7 +15,7 @@ export default class SqlAccess {
 
   async printDbStatus() {
     await this.hold;
-    console.log('Database status:', this.db);
+    console.log("Database status:", this.db);
   }
 
   async setupSchema() {
@@ -56,7 +61,9 @@ export default class SqlAccess {
         `select 1 from current_year_weeks_index where date = '${dateString}'`
       ).then((rows) => {
         if (rows.length === 0) {
-          this.asyncRun(`INSERT INTO current_year_weeks_index (date, obtained) VALUES ('${dateString}', false)`);
+          this.asyncRun(
+            `INSERT INTO current_year_weeks_index (date, obtained) VALUES ('${dateString}', false)`
+          );
         }
       });
     }
@@ -87,7 +94,7 @@ export default class SqlAccess {
     });
   }
 
-  public async asyncGet(command: string) {
+  private async asyncGet(command: string) {
     await this.hold;
     return new Promise<any[]>((resolve, reject) => {
       this.db.all(command, (err, rows) => {
@@ -111,7 +118,5 @@ Date.prototype.toYYMMDD = function (): string {
   const year = this.getFullYear();
   const month = this.getMonth() + 1;
   const day = this.getDate();
-  return `${year}-${month < 10 ? '0' : ''}${month}-${
-    day < 10 ? '0' : ''
-  }${day}`;
+  return `${year}${month < 10 ? "0" : ""}${month}${day < 10 ? "0" : ""}${day}`;
 };
