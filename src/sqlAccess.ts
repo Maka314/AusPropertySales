@@ -8,6 +8,11 @@ export default class SqlAccess {
     this.hold = this.init(dbRoute);
   }
 
+  async printDbStatus() {
+    await this.hold;
+    console.log('Database status:', this.db);
+  }
+
   private async init(dbRoute: string) {
     this.db = await new Promise<Database>((resolve, reject) => {
       const db = new Database(dbRoute, (err) => {
@@ -19,11 +24,6 @@ export default class SqlAccess {
         }
       });
     });
-  }
-
-  async printDbStatus() {
-    await this.hold;
-    console.log('Database status:', this.db);
   }
 
   private async asyncRun(command: string) {
