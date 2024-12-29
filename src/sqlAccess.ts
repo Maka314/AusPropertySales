@@ -31,6 +31,35 @@ export default class SqlAccess {
           obtained BOOLEAN NOT NULL
         )`);
 
+    // Create the trading history table
+    await this.asyncRun(`CREATE TABLE IF NOT EXISTS trading_history (
+        property_id TEXT NOT NULL,
+        dealing_number TEXT NOT NULL,
+        contract_date TEXT NOT NULL,
+        settlement_date TEXT NOT NULL,
+        district_code TEXT NOT NULL,
+        purchase_price INTEGER NOT NULL,
+        purchaser_count INTEGER NOT NULL,
+        vendor_count INTEGER NOT NULL,
+        property_name TEXT,
+        property_unit_number TEXT,
+        property_house_number TEXT,
+        property_street_name TEXT,
+        property_locality TEXT,
+        property_postcode TEXT,
+        area TEXT,
+        area_type TEXT,
+        zoning TEXT,
+        nature_of_property TEXT,
+        primary_purpose TEXT,
+        strata_lot_number INTEGER,
+        conponent_code INTEGER,
+        sale_code INTEGER,
+        interest_of_sale integer,
+        property_legal_description TEXT,
+        PRIMARY KEY (property_id, dealing_number)
+      )`);
+
     // Insert years date into old_years_index
     const currentYear = new Date().getFullYear();
     for (let year = 1990; year < currentYear; year++) {
