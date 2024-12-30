@@ -31,7 +31,6 @@ export interface tradingHistory {
   sale_code?: string;
   interest_of_sale?: string;
   property_legal_description?: string;
-  description?: string;
 }
 
 export async function downloadYearPack(year: number) {
@@ -102,12 +101,16 @@ function parseDatFile(datFile: string): tradingHistory[] {
       tradingHistories.push(tradingHistory);
     } else if (elements[0] === 'C') {
       if (
-        tradingHistories[tradingHistories.length - 1].description === undefined
+        tradingHistories[tradingHistories.length - 1]
+          .property_legal_description === undefined
       ) {
-        tradingHistories[tradingHistories.length - 1].description = elements[5];
+        tradingHistories[
+          tradingHistories.length - 1
+        ].property_legal_description = elements[5];
       } else {
-        tradingHistories[tradingHistories.length - 1].description +=
-          elements[5];
+        tradingHistories[
+          tradingHistories.length - 1
+        ].property_legal_description += elements[5];
       }
     } else if (elements[0] === 'D') {
       if (elements[5] === 'P') {

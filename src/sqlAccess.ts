@@ -1,4 +1,6 @@
-import { Database } from "sqlite3";
+import { Database } from 'sqlite3';
+
+import { tradingHistory } from './tradingHistoryParse';
 
 export default class SqlAccess {
   private db!: Database;
@@ -10,7 +12,91 @@ export default class SqlAccess {
 
   async printDbStatus() {
     await this.hold;
-    console.log("Database status:", this.db);
+    console.log('Database status:', this.db);
+  }
+
+  async insertTradingHistory(dataRow: tradingHistory) {
+    await this.hold;
+    const {
+      property_id,
+      dealing_number,
+      contract_date,
+      settlement_date,
+      district_code,
+      purchase_price,
+      purchaser_count,
+      vendor_count,
+      property_name,
+      property_unit_number,
+      property_house_number,
+      property_street_name,
+      property_locality,
+      property_postcode,
+      area,
+      area_type,
+      zoning,
+      nature_of_property,
+      primary_purpose,
+      strata_lot_number,
+      conponent_code,
+      sale_code,
+      interest_of_sale,
+      property_legal_description,
+    } = dataRow;
+
+    await this.asyncRun(
+      `INSERT INTO trading_history (
+        property_id,
+        dealing_number,
+        contract_date,
+        settlement_date,
+        district_code,
+        purchase_price,
+        purchaser_count,
+        vendor_count,
+        property_name,
+        property_unit_number,
+        property_house_number,
+        property_street_name,
+        property_locality,
+        property_postcode,
+        area,
+        area_type,
+        zoning,
+        nature_of_property,
+        primary_purpose,
+        strata_lot_number,
+        conponent_code,
+        sale_code,
+        interest_of_sale,
+        property_legal_description
+      ) VALUES (
+        '${property_id}',
+        '${dealing_number}',
+        '${contract_date}',
+        '${settlement_date}',
+        '${district_code}',
+        ${purchase_price},
+        ${purchaser_count},
+        ${vendor_count},
+        '${property_name || 'NULL'}',
+        '${property_unit_number || 'NULL'}',
+        '${property_house_number || 'NULL'}',
+        '${property_street_name || 'NULL'}',
+        '${property_locality || 'NULL'}',
+        '${property_postcode || 'NULL'}',
+        '${area || 'NULL'}',
+        '${area_type || 'NULL'}',
+        '${zoning || 'NULL'}',
+        '${nature_of_property || 'NULL'}',
+        '${primary_purpose || 'NULL'}',
+        ${strata_lot_number || 'NULL'},
+        '${conponent_code || 'NULL'}',
+        ${sale_code || 'NULL'},
+        ${interest_of_sale || 'NULL'},
+        '${property_legal_description || 'NULL'}'
+      )`
+    );
   }
 
   async setupSchema() {
@@ -48,7 +134,7 @@ export default class SqlAccess {
         nature_of_property TEXT,
         primary_purpose TEXT,
         strata_lot_number INTEGER,
-        conponent_code INTEGER,
+        conponent_code TEXT,
         sale_code INTEGER,
         interest_of_sale integer,
         property_legal_description TEXT,
@@ -142,5 +228,5 @@ Date.prototype.toYYMMDD = function (): string {
   const year = this.getFullYear();
   const month = this.getMonth() + 1;
   const day = this.getDate();
-  return `${year}${month < 10 ? "0" : ""}${month}${day < 10 ? "0" : ""}${day}`;
+  return `${year}${month < 10 ? '0' : ''}${month}${day < 10 ? '0' : ''}${day}`;
 };
