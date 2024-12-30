@@ -1,13 +1,5 @@
 import AdmZip from 'adm-zip';
 
-jest.mock('../src/tradingHistoryParse', () => {
-  const originalModule = jest.requireActual('../src/tradingHistoryParse');
-  return {
-    ...originalModule,
-    getAllDatFiles: originalModule.getAllDatFiles,
-  };
-});
-
 test('yearDownloadBaseUrl should be correct', () => {
   const yearDownloadBaseUrl =
     'https://www.valuergeneral.nsw.gov.au/__psi/yearly/';
@@ -25,4 +17,16 @@ test('getAllDatFiles should be mocked', () => {
   );
   const datFiles = getAllDatFiles(zip);
   expect(datFiles.length).toBe(6374);
+});
+
+test('parseDatFile', () => {
+  const getAllDatFiles = require('../src/tradingHistoryParse').getAllDatFiles;
+  const parseDatFile = require('../src/tradingHistoryParse').parseDatFile;
+  const zip = new AdmZip(
+    '/workspaces/AusPropertySales/test/testFiles/2023.zip'
+  );
+
+  const datFiles = getAllDatFiles(zip)[0];
+  const parseRes = parseDatFile(datFiles);
+  expect(parseRes.length).toBe(7);
 });

@@ -26,24 +26,25 @@ export interface tradingHistory {
   zoning?: string;
   nature_of_property?: string;
   primary_purpose?: string;
-  strata_lot_number?: number;
-  conponent_code?: number;
-  sale_code?: number;
-  interest_of_sale?: number;
+  strata_lot_number?: string;
+  conponent_code?: string;
+  sale_code?: string;
+  interest_of_sale?: string;
   property_legal_description?: string;
+  description?: string;
 }
 
 export async function downloadYearPack(year: number) {
   const url = yearDownloadBaseUrl + year + '.zip';
   const yearDatas = await axios.get(url, { responseType: 'arraybuffer' });
   const zip = new AdmZip(yearDatas.data);
-  const zipEntries = zip.getEntries();
-  zipEntries.forEach((entry) => {
-    if (entry.isDirectory) {
-      console.log('Directory: ' + entry.entryName);
-    } else {
-      console.log('File: ' + entry.entryName);
-    }
+
+  const datFiles = getAllDatFiles(zip);
+  datFiles.forEach((datFile) => {
+    const datas = parseDatFile(datFile);
+    datas.forEach((data) => {
+      // Save data to database
+    });
   });
 }
 
@@ -64,6 +65,62 @@ function getAllDatFiles(zip: AdmZip): string[] {
   return datFiles;
 }
 
+function parseDatFile(datFile: string): tradingHistory[] {
+  let tradingHistories: tradingHistory[] = [];
+
+  const lines = datFile.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const elements = lines[i].split(';');
+    if (elements[0] === 'A') {
+      continue;
+    } else if (elements[0] === 'B') {
+      let tradingHistory: tradingHistory = {
+        district_code: elements[1],
+        property_id: elements[2],
+        property_name: elements[5],
+        property_unit_number: elements[6],
+        property_house_number: elements[7],
+        property_street_name: elements[8],
+        property_locality: elements[9],
+        property_postcode: elements[10],
+        area: elements[11],
+        area_type: elements[12],
+        contract_date: elements[13],
+        settlement_date: elements[14],
+        purchase_price: parseInt(elements[15]),
+        zoning: elements[16],
+        nature_of_property: elements[17],
+        primary_purpose: elements[18],
+        strata_lot_number: elements[19] === '' ? undefined : elements[19],
+        conponent_code: elements[20] === '' ? undefined : elements[20],
+        sale_code: elements[21] === '' ? undefined : elements[21],
+        interest_of_sale: elements[22],
+        dealing_number: elements[23],
+        purchaser_count: 0,
+        vendor_count: 0,
+      };
+      tradingHistories.push(tradingHistory);
+    } else if (elements[0] === 'C') {
+      if (
+        tradingHistories[tradingHistories.length - 1].description === undefined
+      ) {
+        tradingHistories[tradingHistories.length - 1].description = elements[5];
+      } else {
+        tradingHistories[tradingHistories.length - 1].description +=
+          elements[5];
+      }
+    } else if (elements[0] === 'D') {
+      if (elements[5] === 'P') {
+        tradingHistories[tradingHistories.length - 1].purchaser_count += 1;
+      } else {
+        tradingHistories[tradingHistories.length - 1].vendor_count += 1;
+      }
+    }
+  }
+
+  return tradingHistories;
+}
+
 if (process.env.NODE_ENV === 'test') {
-  module.exports = { getAllDatFiles };
+  module.exports = { getAllDatFiles, parseDatFile };
 }
